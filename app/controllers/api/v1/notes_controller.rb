@@ -24,17 +24,21 @@ module Api
         end
       end
 
-      def destroy
-        @note.destroy
-        render json: { status: 'SUCCESS', message: 'Deleted the note', data: @note }
-      end
-
       def update
         if @note.update(note_params)
           render json: { status: 'SUCCESS', message: 'Updated the note', data: @note }
         else
           render json: { status: 'SUCCESS', message: 'Not updated', data: @note.errors }
         end
+      end
+
+      def destroy
+        @note.destroy
+        render json: { status: 'SUCCESS', message: 'Deleted the note', data: @note }
+      end
+
+      def authenticate
+        render json: { status: 'SUCCESS', message: AuthenticationService.new.authenticate}
       end
 
       private
