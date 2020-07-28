@@ -48,7 +48,9 @@ test:
 #     url: <%= ENV['DATABASE_URL'] %>
 #
 production:
-  <<: *default
+  adapter: postgresql
+  encoding: unicode
+  pool: 5
   database: cognitotest_production
   username: cognitotest
   password: <%= ENV['COGNITOTEST_DATABASE_PASSWORD'] %>
