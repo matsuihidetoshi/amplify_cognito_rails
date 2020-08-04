@@ -39,7 +39,7 @@ module Api
       end
 
       def authenticate
-        render json: { status: 'SUCCESS', message: VerificationService.new(params[:token])}
+        render json: { status: 'SUCCESS', message: 'Verified', data: @claims}
       end
 
       private
@@ -53,8 +53,16 @@ module Api
       end
 
       def verificate
-        verification = VerificationService.new(params[:token])
-        render json: { status: 'ERROR', message: verification.result } unless verification.verified
+        cognito = CognitoService.new(
+          ENV['COGNITOTEST_REGION'],
+          ENV['COGNITOTEST_USERPOOL_ID'],
+          ENV['COGNITOTEST_APP_CLIENT_ID']
+        )
+
+        verification = VerificationService.new(cognito)
+        result = verification.verify(params[:token])
+
+        render json: { status: 'ERROR', message: result[:detail] } unless result[:verified] else @claims = result[:detail]
       end
     end
   end
