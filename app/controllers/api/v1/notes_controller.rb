@@ -38,7 +38,7 @@ module Api
       end
 
       def authenticate
-        render json: { status: 'SUCCESS', message: AuthenticationService.new.authenticate}
+        render json: { status: 'SUCCESS', message: AuthenticationService.new.authenticate(params[:token])}
       end
 
       private
