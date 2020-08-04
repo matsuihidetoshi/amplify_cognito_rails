@@ -54,7 +54,7 @@ module Api
 
       def verificate
         verification = VerificationService.new(params[:token])
-        render json: { status: 'FAILED', message: verification.result } unless verification.verified
+        render json: { status: 'ERROR', message: verification.result } unless verification.verified
       end
     end
   end
