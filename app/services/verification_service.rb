@@ -1,10 +1,14 @@
-class AuthenticationService < ApplicationService
+class VerificationService < ApplicationService
   require "net/http"
   require "json"
   require "jwt"
   require "json/jwt"
 
-  def authenticate(token)
+  attr_accessor :verified, :result
+
+  def initialize(token)
+    # 検証ステータスはデフォルトでfalse
+    @verified = false
     # Cognito User Poolアクセス先を環境変数から取得
     cognitotest_region = ENV['COGNITOTEST_REGION']
     cognitotest_userpool_id = ENV['COGNITOTEST_USERPOOL_ID']
@@ -24,13 +28,15 @@ class AuthenticationService < ApplicationService
     keys = response["keys"]
 
     # パラメータ（ここでは引数）として受け取ったトークンをデコードして、kidを取得
+    token_kid = nil
     begin
       decoded_token = JWT.decode token, nil, false
+      claims = decoded_token[0]
+      token_kid = decoded_token[1]["kid"]
     rescue
       # トークンの形式がおかしくてエラーだったらfalse
-      return false
+      @result =  "invalid token"
     end
-    token_kid = decoded_token[1]["kid"]
 
     # kidがパラメータで受け取ったトークンと一致するキーを取得
     matched_key = keys.find { |key| key["kid"] == token_kid}
@@ -43,14 +49,24 @@ class AuthenticationService < ApplicationService
       begin
         # 公開鍵でトークンをデコードできたらtrue
         JSON::JWT.decode(token, public_key)
-        return true
+
+        # トークンの期限切れ検証
+        if (claims["exp"] < Time.now.to_i)
+          @result = "token expired"
+        # トークンのクライアントid検証
+        elsif (claims["aud"] != cognitotest_app_client_id)
+          @result = "wrong audience"
+        else
+          @verified = true
+          @result = claims
+        end
       rescue
         # できなくてエラーだったらfalse
-        return false
+        @result = "failed to decode token"
       end
     else
       # 一致するキーがなければfalse
-      return false
+      @result = "no kid matched"
     end
   end
 end

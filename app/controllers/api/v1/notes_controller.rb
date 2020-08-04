@@ -4,6 +4,7 @@ module Api
       skip_before_action :verify_authenticity_token
       
       before_action :set_note, only: [:show, :update, :destroy]
+      before_action :verificate
 
       def index
         notes = Note.order(created_at: :desc)
@@ -38,7 +39,7 @@ module Api
       end
 
       def authenticate
-        render json: { status: 'SUCCESS', message: AuthenticationService.new.authenticate(params[:token])}
+        render json: { status: 'SUCCESS', message: VerificationService.new(params[:token])}
       end
 
       private
@@ -49,6 +50,11 @@ module Api
 
       def note_params
         params.require(:note).permit(:title, :content, :user)
+      end
+
+      def verificate
+        verification = VerificationService.new(params[:token])
+        render json: { status: 'FAILED', message: verification.result } unless verification.verified
       end
     end
   end
