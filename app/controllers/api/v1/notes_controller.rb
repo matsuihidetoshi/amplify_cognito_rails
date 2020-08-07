@@ -8,7 +8,7 @@ module Api
 
       def index
         notes = Note.search(search_params).page(params[:page]).per(params[:per]).order(created_at: :desc)
-        render json: { status: 'SUCCESS', message: 'Loaded notes', data: notes }
+        render json: { status: 'SUCCESS', message: 'Loaded notes', data: notes, length: Note.count }
       end
 
       def show
