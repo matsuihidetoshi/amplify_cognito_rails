@@ -7,7 +7,7 @@ module Api
       before_action :verificate
 
       def index
-        notes = Note.order(created_at: :desc)
+        notes = Note.search(search_params).page(params[:page]).per(params[:per]).order(created_at: :desc)
         render json: { status: 'SUCCESS', message: 'Loaded notes', data: notes }
       end
 
@@ -50,6 +50,10 @@ module Api
 
       def note_params
         params.require(:note).permit(:title, :content, :user)
+      end
+
+      def search_params
+        params.fetch(:search, {}).permit(:title_like, :created_from, :created_to, :content_like)
       end
 
       def verificate
