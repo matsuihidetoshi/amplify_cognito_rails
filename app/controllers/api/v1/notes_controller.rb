@@ -7,8 +7,10 @@ module Api
       before_action :verificate
 
       def index
-        notes = Note.search(search_params).page(params[:page]).per(params[:per]).order(created_at: :desc)
-        render json: { status: 'SUCCESS', message: 'Loaded notes', data: notes, length: notes.count }
+        notes = Note.search(search_params)
+        length = notes.length
+        notes = notes.page(params[:page]).per(params[:per]).order(created_at: :desc)
+        render json: { status: 'SUCCESS', message: 'Loaded notes', data: notes, length: length }
       end
 
       def show
