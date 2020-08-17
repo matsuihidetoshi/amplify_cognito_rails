@@ -21,7 +21,7 @@ module Cognitotest
         origins "*"
         resource "*",
           headers: :any,
-          methods: [:get, :post, :options, :head]
+          methods: [:get, :post, :put, :delete, :options, :head]
       end
     end
   end
