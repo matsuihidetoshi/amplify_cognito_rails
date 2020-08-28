@@ -4,7 +4,7 @@ module Api
       skip_before_action :verify_authenticity_token
       
       before_action :set_note, only: [:show, :update, :destroy]
-      before_action :verificate
+      before_action :verify_jwt_token
 
       def index
         notes = Note.search(search_params)
@@ -58,7 +58,7 @@ module Api
         params.fetch(:search, {}).permit(:title_like, :created_from, :created_to, :content_like)
       end
 
-      def verificate
+      def verify_jwt_token
         cognito = CognitoService.new(
           ENV['COGNITOTEST_REGION'],
           ENV['COGNITOTEST_USERPOOL_ID'],
