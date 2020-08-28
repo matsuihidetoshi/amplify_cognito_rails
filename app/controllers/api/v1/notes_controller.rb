@@ -68,7 +68,7 @@ module Api
         verification = VerificationService.new(cognito)
         result = verification.verify(params[:token])
 
-        render json: { status: 'ERROR', message: result[:detail] } unless result[:verified] else @claims = result[:detail]
+        render status: 401, json: { status: 'ERROR', message: result[:detail] } unless result[:verified] else @claims = result[:detail]
       end
     end
   end
