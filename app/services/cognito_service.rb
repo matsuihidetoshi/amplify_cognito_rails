@@ -43,10 +43,10 @@ class CognitoService < ApplicationService
 
     # 一致するキーがちゃんとある
     if matched_key
-      # 一致したキーから公開鍵を作成
-      public_key = JSON::JWK.new(matched_key).to_key
-
       begin
+        # 一致したキーから公開鍵を作成
+        public_key = JSON::JWK.new(matched_key).to_key
+        
         # 公開鍵でトークンをデコードできたらtrue
         JSON::JWT.decode(token, public_key)
 
