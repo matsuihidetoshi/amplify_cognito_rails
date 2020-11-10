@@ -7,12 +7,12 @@ class CognitoService < ApplicationService
   attr_accessor :region, :userpool_id, :app_client_id, :uri, :result
   
   def initialize(region, userpool_id, app_client_id)
-    @region = region
-    @userpool_id = userpool_id
-    @app_client_id = app_client_id
+    self.region = region
+    self.userpool_id = userpool_id
+    self.app_client_id = app_client_id
 
     # Cognito User Poolアクセス先URL作成
-    @uri = URI.parse(
+    self.uri = URI.parse(
       "https://cognito-idp." +
       @region +
       ".amazonaws.com/" +
@@ -20,7 +20,7 @@ class CognitoService < ApplicationService
       "/.well-known/jwks.json"
     )
 
-    @result = {verified: false, detail: nil}
+    self.result = {verified: false, detail: nil}
   end
   
   def verify(token)
@@ -57,10 +57,11 @@ class CognitoService < ApplicationService
         elsif (claims["aud"] != @app_client_id)
           @result[:detail] = "wrong audience"
         else
+          # 検証OKパターン
           @result = {verified: true, detail: claims}
         end
       rescue => e
-        # できなくてエラー
+        # デコードできなくてエラー
         @result[:detail] = e
       end
     else
@@ -69,5 +70,15 @@ class CognitoService < ApplicationService
     end
 
     return @result
+  end
+
+  # 検証できているかどうかを返す
+  def verified?
+    self.result[:verified]
+  end
+
+  # 検証していなければnil, 検証NGならエラー詳細, 検証OKならclaimを返す
+  def detail
+    self.result[:detail]
   end
 end

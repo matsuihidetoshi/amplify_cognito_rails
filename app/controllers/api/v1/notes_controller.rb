@@ -65,9 +65,9 @@ module Api
           ENV['COGNITOTEST_APP_CLIENT_ID']
         )
 
-        result = cognito.verify(params[:token])
+        cognito.verify(params[:token])
 
-        render status: 401, json: { status: 'ERROR', message: result[:detail] } unless result[:verified] else @claims = result[:detail]
+        render status: 401, json: { status: 'ERROR', message: cognito.detail } unless cognito.verified? else @claims = cognito.detail
       end
     end
   end
